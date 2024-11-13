@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
         });
         return errors;
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AccommodationNoPlaceLeftException.class)
+    public String handleAccommodationNoPlaceLeft(AccommodationNoPlaceLeftException ex) {
+        return ex.getMessage();
+    }
 }

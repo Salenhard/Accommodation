@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import salen.Hotel.entity.Accommodation;
 import salen.Hotel.entity.ReputationBadge;
+import salen.Hotel.exception.AccommodationNoPlaceLeftException;
 import salen.Hotel.exception.AccommodationNotFoundException;
 import salen.Hotel.repository.AccommodationRepository;
 
@@ -42,15 +43,13 @@ public class AccommodationService {
 
     @Transactional
     @CachePut(value = "accommodations", key = "#accommodation.id")
-    public boolean book(Long id) {
+    public void book(Long id) {
         Accommodation accommodation = repository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
-        if (accommodation.getAvailability() == 0)
-            return false;
-        else {
-            accommodation.setAvailability(accommodation.getAvailability() - 1);
-            save(accommodation);
-            return true;
-        }
+
+        if (accommodation.getAvailability() <= 0) throw new AccommodationNoPlaceLeftException();
+
+        accommodation.setAvailability(accommodation.getAvailability() - 1);
+        save(accommodation);
     }
 
     public List<Accommodation> getAllByRating(Integer rating) {

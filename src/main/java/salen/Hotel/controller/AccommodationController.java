@@ -1,7 +1,7 @@
 package salen.Hotel.controller;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import salen.Hotel.entity.Accommodation;
@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/accommodations")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccommodationController {
     private final AccommodationService service;
 
@@ -63,10 +63,8 @@ public class AccommodationController {
 
     @GetMapping("/book/{id}")
     public ResponseEntity<?> book(@PathVariable Long id) {
-        if (service.book(id))
-            return ResponseEntity.ok().body("You booked accommodation");
-        else
-            return ResponseEntity.badRequest().body("No place left");
+        service.book(id);
+        return ResponseEntity.ok().body("You booked accommodation");
     }
 
     @GetMapping("/search")

@@ -36,13 +36,13 @@ public class AccommodationService {
     }
 
     @Transactional
-    @CacheEvict(value = "accommodations", key = "#accommodation.id")
+    @CacheEvict(value = "accommodations", key = "#id")
     public void delete(Long id) {
         repository.deleteById(id);
     }
 
     @Transactional
-    @CachePut(value = "accommodations", key = "#accommodation.id")
+    @CachePut(value = "accommodations", key = "#id")
     public void book(Long id) {
         Accommodation accommodation = repository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
 

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import salen.Hotel.entity.Accommodation;
 import salen.Hotel.entity.ReputationBadge;
-import salen.Hotel.exception.AccommodationAlreadyExists;
+import salen.Hotel.exception.AccommodationAlreadyExistsException;
 import salen.Hotel.exception.AccommodationNotFoundException;
 import salen.Hotel.exception.ReputationBadgeNotFoundException;
 import salen.Hotel.service.AccommodationService;
@@ -33,7 +33,7 @@ public class AccommodationController {
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid Accommodation accommodation) {
         if (service.get(accommodation.getId()).isPresent())
-            throw new AccommodationAlreadyExists(accommodation.getId());
+            throw new AccommodationAlreadyExistsException(accommodation.getId());
         return ResponseEntity.ok().body(service.save(accommodation));
     }
 

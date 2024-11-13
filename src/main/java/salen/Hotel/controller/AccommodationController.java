@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import salen.Hotel.entity.Accommodation;
 import salen.Hotel.entity.ReputationBadge;
+import salen.Hotel.entity.dto.AccommodationDto;
+import salen.Hotel.entity.mapper.AccommodationMapper;
 import salen.Hotel.exception.AccommodationAlreadyExistsException;
 import salen.Hotel.exception.AccommodationNotFoundException;
 import salen.Hotel.exception.ReputationBadgeNotFoundException;
@@ -19,22 +21,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccommodationController {
     private final AccommodationService service;
+    private final AccommodationMapper mapper;
 
     @GetMapping
-    public List<Accommodation> getAll() {
-        return service.getAll();
+    public List<AccommodationDto> getAll() {
+        return service.getAll().stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public Accommodation get(@PathVariable Long id) {
-        return service.get(id).orElseThrow(() -> new AccommodationNotFoundException(id));
+    public AccommodationDto get(@PathVariable Long id) {
+        return mapper.toDto(service.get(id).orElseThrow(() -> new AccommodationNotFoundException(id)));
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody @Valid Accommodation accommodation) {
-        if (service.get(accommodation.getId()).isPresent())
-            throw new AccommodationAlreadyExistsException(accommodation.getId());
-        return ResponseEntity.ok().body(service.save(accommodation));
+    public ResponseEntity<?> save(@RequestBody @Valid AccommodationDto accommodationDto) {
+        if (accommodationDto.getId() != null && service.get(accommodationDto.getId()).isPresent())
+            throw new AccommodationAlreadyExistsException(accommodationDto.getId());
+        return ResponseEntity.ok().body(mapper.toDto(service.save(mapper.toEntity(accommodationDto))));
     }
 
     @DeleteMapping("/{id}")
@@ -44,7 +47,8 @@ public class AccommodationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid Accommodation newAccommodation) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid AccommodationDto newAccommodationDto) {
+        Accommodation newAccommodation = mapper.toEntity(newAccommodationDto);
         Accommodation updatedAccommodation = service.get(id).map(accommodation ->
         {
             accommodation.setName(newAccommodation.getName());
@@ -58,7 +62,7 @@ public class AccommodationController {
             accommodation.setReputationBadge();
             return accommodation;
         }).orElseThrow(() -> new AccommodationNotFoundException(id));
-        return ResponseEntity.ok().body(service.save(updatedAccommodation));
+        return ResponseEntity.ok().body(mapper.toDto(service.save(updatedAccommodation)));
     }
 
     @GetMapping("/book/{id}")
@@ -68,34 +72,37 @@ public class AccommodationController {
     }
 
     @GetMapping("/search")
-    public List<Accommodation> filter(@RequestParam Optional<Integer> rating, @RequestParam Optional<String> city, @RequestParam Optional<String> badge) {
+    public List<AccommodationDto> filter(@RequestParam Optional<Integer> rating, @RequestParam Optional<String> city, @RequestParam Optional<String> badge) {
         ReputationBadge reputationBadge;
         try {
             reputationBadge = ReputationBadge.valueOf(badge.orElse("GREEN").toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ReputationBadgeNotFoundException(badge.get());
         }
-        return service.getAllByFilters(rating.orElse(5), city.orElse(""), reputationBadge);
+        return service.getAllByFilters(rating.orElse(5), city.orElse(""), reputationBadge)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @GetMapping("/rating/{rating}")
-    public List<Accommodation> getByRating(@PathVariable Integer rating) {
-        return service.getAllByRating(rating);
+    public List<AccommodationDto> getByRating(@PathVariable Integer rating) {
+        return service.getAllByRating(rating).stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/city/{city}")
-    public List<Accommodation> getAllByCity(@PathVariable String city) {
-        return service.getAllByCity(city);
+    public List<AccommodationDto> getAllByCity(@PathVariable String city) {
+        return service.getAllByCity(city).stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/badge/{badge}")
-    public List<Accommodation> getAllByReputationBadge(@PathVariable String badge) {
+    public List<AccommodationDto> getAllByReputationBadge(@PathVariable String badge) {
         ReputationBadge reputationBadge;
         try {
             reputationBadge = ReputationBadge.valueOf(badge.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ReputationBadgeNotFoundException(badge);
         }
-        return service.getAllByReputationBadge(reputationBadge);
+        return service.getAllByReputationBadge(reputationBadge).stream().map(mapper::toDto).toList();
     }
 }

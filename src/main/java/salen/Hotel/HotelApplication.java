@@ -1,11 +1,13 @@
 package salen.Hotel;
 
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
+@SpringMapperConfig
 public class HotelApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HotelApplication.class, args);

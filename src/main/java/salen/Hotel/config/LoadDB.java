@@ -10,6 +10,7 @@ import salen.Hotel.entity.Accommodation;
 import salen.Hotel.entity.Category;
 import salen.Hotel.entity.Location;
 import salen.Hotel.entity.ReputationBadge;
+import salen.Hotel.entity.mapper.AccommodationMapper;
 import salen.Hotel.repository.AccommodationRepository;
 
 @Configuration
@@ -17,6 +18,7 @@ import salen.Hotel.repository.AccommodationRepository;
 public class LoadDB {
     private final Logger log = LoggerFactory.getLogger(LoadDB.class);
     private final AccommodationRepository repository;
+    private final AccommodationMapper mapper;
 
     @Bean
     CommandLineRunner load() {

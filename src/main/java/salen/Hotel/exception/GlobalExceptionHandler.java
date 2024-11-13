@@ -24,21 +24,25 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({AccommodationNotFoundException.class, ReputationBadgeNotFoundException.class})
+    public String handleNotFoundExceptions(RuntimeException ex) {
+        return ex.getMessage();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
             AccommodationNoPlaceLeftException.class,
-            AccommodationNotFoundException.class,
             AccommodationAlreadyExistsException.class,
             AccommodationNameNotAllowedException.class,
-            ReputationBadgeNotFoundException.class
     })
     public String handleAccommodationExceptions(RuntimeException ex) {
         return ex.getMessage();
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RuntimeException.class)
-    public String handleRuntimeException(RuntimeException ex)
-    {
+    public String handleRuntimeException(RuntimeException ex) {
         return ex.getMessage();
     }
 }

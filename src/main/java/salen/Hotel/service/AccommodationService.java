@@ -1,9 +1,11 @@
 package salen.Hotel.service;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import salen.Hotel.entity.Accommodation;
@@ -13,7 +15,10 @@ import salen.Hotel.exception.AccommodationNotFoundException;
 import salen.Hotel.repository.AccommodationRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static salen.Hotel.util.AccommodationSpecification.*;
 
 @Service
 @AllArgsConstructor
@@ -66,5 +71,12 @@ public class AccommodationService {
 
     public List<Accommodation> getAllByFilters(Integer rating, String city, ReputationBadge reputationBadge) {
         return repository.findAllByRatingAndLocation_CityLikeAndReputationBadge(rating, city, reputationBadge);
+    }
+
+    public List<Accommodation> getAll(Integer rating, String city, ReputationBadge reputationBadge) {
+        Specification<Accommodation> filters = Specification.where((StringUtils.isBlank(city) ? null : cityLike(city))
+                .and(Objects.isNull(rating) ? null : hasRating(rating))
+                .and(Objects.isNull(reputationBadge) ? null : hasReputationBadge(reputationBadge)));
+        return repository.findAll(filters);
     }
 }

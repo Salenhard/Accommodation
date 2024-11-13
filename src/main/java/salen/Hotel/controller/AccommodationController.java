@@ -79,7 +79,7 @@ public class AccommodationController {
         } catch (IllegalArgumentException e) {
             throw new ReputationBadgeNotFoundException(badge.get());
         }
-        return service.getAllByFilters(rating.orElse(5), city.orElse(""), reputationBadge)
+        return service.getAll(rating.orElse(5), city.orElse(""), reputationBadge)
                 .stream()
                 .map(mapper::toDto)
                 .toList();

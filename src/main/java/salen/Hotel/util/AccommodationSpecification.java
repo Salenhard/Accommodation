@@ -9,7 +9,7 @@ import salen.Hotel.entity.ReputationBadge;
 public class AccommodationSpecification {
     private AccommodationSpecification() {
     }
-
+ 
     public static Specification<Accommodation> cityLike(String cityLike) {
 
         return (root, query, builder) ->{
